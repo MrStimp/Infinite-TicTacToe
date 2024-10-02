@@ -1,9 +1,12 @@
+
 class TicTacToe:
     def __init__(self):
         self.player1Moves = []
         self.player2Moves = []
+        self.totalMoves = []
         self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.crosses = True
+        self.moveNumber = 1
 
     def displayBoard(self):
         for row in self.board:
@@ -20,11 +23,12 @@ class TicTacToe:
             return False
 
         if self.crosses:
-            self.board[x][y] = "1"
+            self.board[x][y] = 1
             self.player1Moves.append((x, y))
         else:
-            self.board[x][y] = "2"
+            self.board[x][y] = 2
             self.player2Moves.append((x, y))
+        self.removeMove()
         return True
 
     def checkWin(self):
@@ -41,25 +45,27 @@ class TicTacToe:
 
         for combination in winning_combinations:
             values = [self.board[x][y] for x, y in combination]
-            if values == ["1", "1", "1"]:
-                print("Player 1 (X) wins!")
+            if values == [1, 1, 1]:
+                # print("Player 1 (X) wins!")
                 return True
-            if values == ["2", "2", "2"]:
-                print("Player 2 (O) wins!")
+            elif values == [2, 2, 2]:
+                # print("Player 2 (O) wins!")
                 return True
+            
+        # TODO need to change
+        if all(cell != 0 for row in self.board for cell in row):
+            return False
+
+        return False
 
     def removeMove(self):
         if self.crosses and len(self.player1Moves) > 3:
-            x,y = self.player1Moves.pop(0)
+            x, y = self.player1Moves.pop(0)
             self.board[x][y] = 0
-            print(x,y)
 
         elif len(self.player2Moves) > 3:
-            x,y = self.player2Moves.pop(0)
+            x, y = self.player2Moves.pop(0)
             self.board[x][y] = 0
-            print(x,y)
-
-
 
     def gameLoop(self):
         gameOver = False
@@ -75,7 +81,6 @@ class TicTacToe:
             while not self.addMove(x, y):
                 x, y = self.inputMove()
 
-            self.removeMove()
             if self.checkWin():
                 break
 
@@ -84,12 +89,32 @@ class TicTacToe:
             else:
                 self.crosses = True
 
+    def earlyMoves(self):
+        if self.moveNumber < 3:
+            if self.crosses:
+                for i in range(4 - self.moveNumber):
+                    self.player1Moves.pop()
+
+                for move in self.player1Moves:
+                    x,y = move
+                    self.board[x][y] = 1
+
+            else:
+                for i in range(4 - self.moveNumber):
+                    self.player2Moves.pop()
+
+                for move in self.player2Moves:
+                    x,y = move
+                    self.board[x][y] = 2
+
+
 
 
 def main():
     game = TicTacToe()
 
     game.gameLoop()
+
 
 
 if __name__ == "__main__":
